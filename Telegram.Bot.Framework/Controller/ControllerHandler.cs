@@ -48,10 +48,17 @@ namespace Telegram.Bot.Framework.Controller
             switch (result)
             {
                 case string msg:
-                    if (context.Update.Type == UpdateType.Message)
+                    User? user = context.Update.GetUser();
+                    if (user == null)
+                        break;
+                    if (context.Update.Message != null && context.Update.Message.Chat.Id != user.Id)
                     {
-                        await context.Client.SendTextMessageAsync(context.Update.Message!.Chat.Id, msg);
+                        await context.Client.SendTextMessageAsync(context.Update.Message.Chat.Id, msg, replyToMessageId: context.Update.Message.MessageId);
                     }
+                    else
+                    {
+                        await context.Client.SendTextMessageAsync(user.Id, msg);
+                    }                
                     break;
             }
         }
