@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.FSM;
 using Telegram.Bot.Framework.Updates;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace Telegram.Bot.Framework.Middleware
@@ -19,15 +20,11 @@ namespace Telegram.Bot.Framework.Middleware
 
         public async Task Invoke(IUpdateContext context, UpdateDelegate next)
         {
-            long userId = 0;
-            if (context.Update.Type == UpdateType.Message)
-            {
-                userId = context.Update.Message!.From!.Id;
-            }
+            User? user = context.Update.GetUser();
             string? state = null;
-            if (userId != 0)
+            if (user != null)
             {
-                state = await _stateStorage.GetUserStateAsync(userId);
+                state = await _stateStorage.GetUserStateAsync(user.Id);
             }
             context.Items.Add(ContextItemName, state);
             await next(context);

@@ -44,7 +44,8 @@ namespace Telegram.Bot.Framework.Controller
         public async Task Invoke(IUpdateContext context)
         {
             object? result = await _invokeDelegate.Invoke(context);
-
+            if (result == null)
+                return;
             switch (result)
             {
                 case string msg:
